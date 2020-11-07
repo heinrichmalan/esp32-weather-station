@@ -37,7 +37,7 @@ def sensor_data(station_id):
     j = sensor_reading.join(
         sensor, sensor_reading.c.sensor_type == sensor.c.id)
     query = select([sensor_reading, sensor]).select_from(j).where(
-        sensor_reading.c.time_taken >= three_hours_ago and sensor_reading.c.device_id == int(station_id)).order_by(asc(sensor_reading.c.time_taken))
+        sensor_reading.c.time_taken >= three_hours_ago and sensor_reading.c.device == int(station_id)).order_by(asc(sensor_reading.c.time_taken))
     res = con.execute(query)
 
     temp_data = []
