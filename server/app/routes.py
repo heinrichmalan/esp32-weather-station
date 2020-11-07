@@ -26,8 +26,8 @@ def available_sensors():
     return jsonify({"sensors": data})
 
 
-@app.route('/sensor-data/historical')
-def sensor_data():
+@app.route('/sensor-data/<station_id>/historical')
+def sensor_data(station_id):
     kwargs = {}
     if request.args:
         kwargs = {k: int(v) for k, v in request.args.items()}
@@ -37,7 +37,7 @@ def sensor_data():
     j = sensor_reading.join(
         sensor, sensor_reading.c.sensor_type == sensor.c.id)
     query = select([sensor_reading, sensor]).select_from(j).where(
-        sensor_reading.c.time_taken >= three_hours_ago).order_by(asc(sensor_reading.c.time_taken))
+        sensor_reading.c.time_taken >= three_hours_ago and sensor_reading.c.device_id == int(station_id)).order_by(asc(sensor_reading.c.time_taken))
     res = con.execute(query)
 
     temp_data = []
@@ -69,10 +69,11 @@ def sensor_data():
     })
 
 
-@app.route('/sensor-data/latest')
-def latest_sensor_data():
+@app.route('/sensor-data/<station_id>/latest')
+def latest_sensor_data(station_id):
     session = Session()
     temp_sr, temp_s = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
+        filter(SensorReading.device == int(station_id)).\
         filter(Sensor.type == "temperature").order_by(
             desc(SensorReading.time_taken)).first()
 
@@ -81,6 +82,7 @@ def latest_sensor_data():
     temp = f"{temp} {units}"
 
     hum_sr, hum_s = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
+        filter(SensorReading.device == int(station_id)).\
         filter(Sensor.type == "humidity").order_by(
             desc(SensorReading.time_taken)).first()
     humidity = hum_sr.value
@@ -88,6 +90,7 @@ def latest_sensor_data():
     humidity = f"{humidity} {units}"
 
     press_sr, press_s = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
+        filter(SensorReading.device == int(station_id)).\
         filter(Sensor.type == "air_pressure").order_by(
             desc(SensorReading.time_taken)).first()
     pressure = press_sr.value
