@@ -15,6 +15,17 @@ def index():
     return "Hello, World!"
 
 
+@app.route('/sensors')
+def available_sensors():
+    session = Session()
+    q = session.query(Device)
+    res = q.all()
+
+    data = [{"id": d.id, "name": d.name} for d in res]
+    session.close()
+    return jsonify({"sensors": data})
+
+
 @app.route('/sensor-data/historical')
 def sensor_data():
     kwargs = {}
