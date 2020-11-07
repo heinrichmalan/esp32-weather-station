@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-
+import { useParams } from "react-router-dom";
 import { Spinner } from "../Spinner";
 import Chart from "../WeatherChart";
 
-export const DataContainer = ({ stationId = 1 }) => {
+export const DataContainer = () => {
     const [requesting, setRequesting] = useState(false);
     const [chartData, setChartData] = useState({
         tempData: [],
@@ -19,6 +19,8 @@ export const DataContainer = ({ stationId = 1 }) => {
         latestTimeout: null,
         selectValue: "hours=3",
     });
+
+    let { stationId = 1 } = useParams();
 
     useEffect(() => {
         const latestTimeout = setInterval(() => {
@@ -36,7 +38,7 @@ export const DataContainer = ({ stationId = 1 }) => {
     const getLatestData = async () => {
         setRequesting(true);
         try {
-            const url = "http://192.168.0.111:5000/sensor-data/latest";
+            const url = `http://192.168.0.111:5000/sensor-data/${stationId}/latest`;
 
             const res = await fetch(url);
             const data = await res.json();
@@ -53,7 +55,7 @@ export const DataContainer = ({ stationId = 1 }) => {
         if (requesting) return;
         setRequesting(true);
         try {
-            const url = `http://192.168.0.111:5000/sensor-data/historical${
+            const url = `http://192.168.0.111:5000/sensor-data/${stationId}/historical${
                 params ? `?${params}` : ""
             }`;
 
