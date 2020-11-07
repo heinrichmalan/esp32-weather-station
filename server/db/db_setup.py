@@ -33,7 +33,7 @@ Base = declarative_base()
 
 
 class Device(Base):
-    __tablename__ = "Device"
+    __tablename__ = "device"
 
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String)
