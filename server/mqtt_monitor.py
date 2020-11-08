@@ -30,10 +30,21 @@ def on_message(client, userdata, msg):
         return
     _, device_name, sensor_type = topic.split("/")
 
-    device_id = conn.execute(device.select().where(
-        device.c.name == device_name)).fetchone().id
-    sensor_id = conn.execute(sensor.select().where(
-        sensor.c.type == sensor_type)).fetchone().id
+    device_entry = conn.execute(device.select().where(
+        device.c.name == device_name)).fetchone()
+
+    if not device_entry:
+        return
+    device_id = device_entry.id
+
+    sensor_entry = conn.execute(sensor.select().where(
+        sensor.c.type == sensor_type)).fetchone()
+
+    if not sensor_entry:
+        return
+
+    sensor_id = sensor_entry.id
+
     print(f"Device: {device_name}, Sensor: {sensor_type}, Payload: {payload}")
     ins = sensor_reading.insert().values(
         device=device_id, sensor_type=sensor_id, value=payload)
