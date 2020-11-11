@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import styled from "styled-components";
 const HeaderRow = styled.div`
     height: 50%;
@@ -34,7 +35,12 @@ export const Header = () => {
 
     return (
         <header className="App-header">
-            <HeaderRow>LOGO</HeaderRow>
+            <HeaderRow>
+                <img
+                    height="25px"
+                    src={process.env.PUBLIC_URL + "/assets/clouds.png"}
+                />
+            </HeaderRow>
             <HeaderRow>
                 {devices.map((item) => (
                     <NavItem>{item.name}</NavItem>
