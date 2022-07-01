@@ -1,4 +1,7 @@
 flask
+flask-cors
+gunicorn
+ipython
 paho-mqtt
 psycopg2
 sqlalchemy

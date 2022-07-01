@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 
 from flask import jsonify
 
-from . import app
-from ..db.db_setup import con, sensor_reading, sensor, Session, Sensor, SensorReading, Device
+from app import app
+from db.db_setup import con, sensor_reading, sensor, Session, Sensor, SensorReading, Device
 from sqlalchemy import select, desc, asc
 from flask import request
 
@@ -72,30 +72,42 @@ def sensor_data(station_id):
 @app.route('/sensor-data/<station_id>/latest')
 def latest_sensor_data(station_id):
     session = Session()
-    temp_sr, temp_s = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
+    latest_temp = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
         filter(SensorReading.device == int(station_id)).\
         filter(Sensor.type == "temperature").order_by(
             desc(SensorReading.time_taken)).first()
 
-    temp = temp_sr.value
-    units = temp_s.units
-    temp = f"{temp} {units}"
+    if latest_temp:
+        temp_sr, temp_s = latest_temp
+        temp = temp_sr.value
+        units = temp_s.units
+        temp = f"{temp} {units}"
+    else:
+        temp = "N/A"
 
-    hum_sr, hum_s = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
+    latest_humidity = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
         filter(SensorReading.device == int(station_id)).\
         filter(Sensor.type == "humidity").order_by(
             desc(SensorReading.time_taken)).first()
-    humidity = hum_sr.value
-    units = hum_s.units
-    humidity = f"{humidity} {units}"
+    
+    if latest_humidity:
+        hum_sr, hum_s = latest_humidity
+        humidity = hum_sr.value
+        units = hum_s.units
+        humidity = f"{humidity} {units}"
+    else:
+        humidity = "N/A"
 
-    press_sr, press_s = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
+    latest_pressure = session.query(SensorReading, Sensor).filter(SensorReading.sensor_type == Sensor.id).\
         filter(SensorReading.device == int(station_id)).\
         filter(Sensor.type == "air_pressure").order_by(
             desc(SensorReading.time_taken)).first()
-    pressure = press_sr.value
-    units = press_s.units
-    pressure = f"{pressure} {units}"
+
+    if latest_pressure:
+        press_sr, press_s = latest_pressure
+        pressure = press_sr.value
+        units = press_s.units
+        pressure = f"{pressure} {units}"
     session.close()
     return jsonify({
         'temperature': temp,
