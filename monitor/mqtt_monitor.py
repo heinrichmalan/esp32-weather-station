@@ -4,7 +4,7 @@ import math
 
 import paho.mqtt.client as mqtt
 
-from db.db_setup import device, sensor, sensor_reading, engine
+from db.db_setup import device, sensor, sensor_reading, engine, Device, Session
 
 
 conn = engine.connect()
@@ -25,22 +25,29 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     topic: str = msg.topic
     payload = float(msg.payload.decode())
+    print(topic, payload)
     if math.isnan(payload):
         print("Value was NaN")
         return
     _, device_name, sensor_type = topic.split("/")
-
+    print(device_name, sensor_type, payload)
     device_entry = conn.execute(device.select().where(
         device.c.name == device_name)).fetchone()
 
     if not device_entry:
-        return
+        print("Device with name {device_name} not found. Creating.")
+        with Session() as session:
+            device_entry = Device(name=device_name)
+            session.add(device_entry)
+            session.commit()
+
     device_id = device_entry.id
 
     sensor_entry = conn.execute(sensor.select().where(
         sensor.c.type == sensor_type)).fetchone()
 
     if not sensor_entry:
+        print(f"Sensor not found for type {sensor_type}")
         return
 
     sensor_id = sensor_entry.id
@@ -56,7 +63,7 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 print("Connecting to mqtt client")
-client.connect("192.168.0.111", 1883, 60)
+client.connect("mqtt", 1883, 60)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
