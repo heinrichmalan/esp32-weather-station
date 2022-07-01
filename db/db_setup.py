@@ -2,7 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, Column, Integer, String, MetaData, Float, ForeignKey, create_engine, DateTime
 from sqlalchemy.sql import func
 from sqlalchemy.orm import sessionmaker
-engine = create_engine('postgresql:///sensor_data')
+engine = create_engine('postgresql://postgres:postgres@db:5432/sensorsdata')
 con = engine.connect()
 meta = MetaData()
 
@@ -62,3 +62,9 @@ Session = sessionmaker(bind=engine)
 
 def set_up():
     meta.create_all(engine)
+    with Session() as session:
+        temp_sensor = Sensor(type="temperature", units="degrees C")
+        humidity = Sensor(type="humidity", units="relative")
+        pressure = Sensor(type="air_pressure", units="hectopascal")
+        session.add_all([temp_sensor, humidity, pressure])
+        session.commit()
