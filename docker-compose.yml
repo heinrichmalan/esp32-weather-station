@@ -1,5 +1,6 @@
 services:
   frontend:
+    restart: always
     build:
       context: ./frontend
       dockerfile: ./Dockerfile
@@ -10,7 +11,8 @@ services:
       - backend
 
 
-  backend:    
+  backend:
+    restart: always
     build:
       context: ./server
       dockerfile: ./Dockerfile
@@ -24,6 +26,7 @@ services:
       - db
 
   db:
+    restart: always
     image: postgres:11.5-alpine
     volumes:
       - "db:/var/lib/postgresql/data"
@@ -39,7 +42,8 @@ services:
       interval: 20s
       retries: 3
 
-  monitor:    
+  monitor:
+    restart: always    
     build:
       context: ./monitor
       dockerfile: ./Dockerfile
@@ -52,6 +56,7 @@ services:
       - db
 
   mqtt:
+    restart: always
     build:
       context: ./mqtt
       dockerfile: ./Dockerfile
