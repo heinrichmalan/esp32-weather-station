@@ -16,7 +16,7 @@ const NavItem = styled.a`
 
 const getDevices = async (setDevices) => {
     try {
-        const url = `http://localhost:4000/sensors`;
+        const url = `http://192.168.1.108:4000/sensors`;
 
         const res = await fetch(url);
         const data = await res.json();

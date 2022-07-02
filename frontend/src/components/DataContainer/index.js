@@ -39,7 +39,7 @@ export const DataContainer = () => {
     const getLatestData = async () => {
         setRequesting(true);
         try {
-            const url = `http://localhost:4000/sensor-data/${stationId}/latest`;
+            const url = `http://192.168.1.108:4000/sensor-data/${stationId}/latest`;
 
             const res = await fetch(url);
             const data = await res.json();
@@ -56,7 +56,7 @@ export const DataContainer = () => {
         if (requesting) return;
         setRequesting(true);
         try {
-            const url = `http://localhost:4000/sensor-data/${stationId}/historical${
+            const url = `http://192.168.1.108:4000/sensor-data/${stationId}/historical${
                 params ? `?${params}` : ""
             }`;
 
